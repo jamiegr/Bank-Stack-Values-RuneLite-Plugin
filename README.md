@@ -47,7 +47,7 @@ Compiled against RuneLite **1.12.38**, targeting Java 11 bytecode. The plugin JA
 
 The automated tests cover price multiplication, integer overflow, empty stacks, placeholders (including bank tag layout placeholders), real maximum-size stacks, unavailable prices, changing prices and quantities, abbreviations, button state, both click directions, bank close/reopen, widget rebuilding, and shutdown cleanup that preserves other plugins' children.
 
-**Live in-game verification has not been performed.** Before regular use, check the following in your development client:
+**Live in-game verification has been performed by the developer.** Before regular use, check the following in your development client:
 
 1. Compare one known stack with unit price × quantity.
 2. Toggle off/on, close/reopen the bank, and restart the client to check persistence.
