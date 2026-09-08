@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import javax.inject.Inject;
 import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.widgets.ItemQuantityMode;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.overlay.WidgetItemOverlay;
@@ -27,6 +28,13 @@ class BankStackValuesOverlay extends WidgetItemOverlay
     {
         // Excludes tab icons, inventory, potion storage and other bank controls.
         if (!config.overlayEnabled() || item.getWidget().getId() != InterfaceID.Bankmain.ITEMS)
+        {
+            return;
+        }
+        // Bank Tags layouts use a real item ID with this dummy quantity for missing items.
+        // Check the quantity mode too so genuine maximum-size stacks still get a value.
+        if (item.getQuantity() == Integer.MAX_VALUE
+            && item.getWidget().getItemQuantityMode() == ItemQuantityMode.NEVER)
         {
             return;
         }

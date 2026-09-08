@@ -27,7 +27,7 @@ This is a local development plugin, not an installed Plugin Hub entry. The inclu
 
 - Labels use the stack quantity multiplied by RuneLite's cached item price, following the same price source and item mappings as RuneLite's built-in Bank plugin. RuneLite's active-traded-price preference therefore applies.
 - `K`, `M`, `B` and `T` abbreviations are truncated to fit item slots. Values are in gp.
-- Zero-quantity placeholders, empty slots and items with no positive price have no label. Some untradeable variants can have a mapped value through RuneLite's item mappings; coins and platinum tokens use RuneLite's currency values.
+- Zero-quantity placeholders, bank tag layout placeholders, empty slots and items with no positive price have no label. Some untradeable variants can have a mapped value through RuneLite's item mappings; coins and platinum tokens use RuneLite's currency values.
 - Labels follow the displayed bank items as the bank scrolls, filters or changes tabs. Quantity text at the top of an icon remains visible.
 - This version targets the ordinary personal bank item grid. Potion storage, shared storage and bank-tag sidebar display panels are outside its scope.
 - **Value colour** changes label colour. **Button right offset** and **Button top offset** move the button if a long bank title or another plugin overlaps it. The button remains anchored to the bank's right edge when resized.
@@ -43,7 +43,7 @@ Price data comes from RuneLite's `ItemManager`; the plugin makes no separate pri
 
 Compiled against RuneLite **1.12.38**, targeting Java 11 bytecode. The plugin JAR is generated in `build/libs/`.
 
-The 12 automated tests pass. They cover price multiplication, integer overflow, empty stacks, placeholders, unavailable prices, changing prices and quantities, abbreviations, button state, both click directions, bank close/reopen, widget rebuilding, and shutdown cleanup that preserves other plugins' children.
+The automated tests cover price multiplication, integer overflow, empty stacks, placeholders (including bank tag layout placeholders), real maximum-size stacks, unavailable prices, changing prices and quantities, abbreviations, button state, both click directions, bank close/reopen, widget rebuilding, and shutdown cleanup that preserves other plugins' children.
 
 **Live in-game verification has not been performed.** Before regular use, check the following in your development client:
 
