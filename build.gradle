@@ -7,7 +7,7 @@ repositories {
     mavenCentral()
 }
 
-def runeLiteVersion = findProperty('runeliteVersion') ?: '1.12.38'
+def runeLiteVersion = findProperty('runeliteVersion') ?: 'latest.release'
 
 group = 'com.bankstackvalues'
 version = '1.0.0'
