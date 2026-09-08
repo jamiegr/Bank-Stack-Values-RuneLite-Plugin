@@ -25,42 +25,64 @@ public class StackValueTest
     @Test public void multipliesUnitPriceByStackQuantity()
     {
         when(manager.getItemPrice(100)).thenReturn(250);
-        assertEquals(125_000L, values.total(100, 500));
+        assertEquals(125_000L, values.total(100, 500, false));
+    }
+
+    @Test public void hidesUntradableItemsWithMappedPrices()
+    {
+        when(manager.getItemPrice(100)).thenReturn(250);
+        assertEquals(0, values.total(100, 500, true));
+        verify(manager, never()).getItemPrice(anyInt());
+    }
+
+    @Test public void keepsTradableValuesWhenHidingUntradables()
+    {
+        when(item.isTradeable()).thenReturn(true);
+        when(manager.getItemPrice(100)).thenReturn(250);
+        assertEquals(125_000L, values.total(100, 500, true));
+    }
+
+    @Test public void showsUntradableValuesByDefault()
+    {
+        BankStackValuesConfig config = new BankStackValuesConfig() {};
+        assertFalse(config.hideUntradableValues());
+        when(manager.getItemPrice(100)).thenReturn(250);
+        assertEquals(125_000L, values.total(100, 500, config.hideUntradableValues()));
     }
 
     @Test public void doesNotOverflowInt()
     {
         when(manager.getItemPrice(100)).thenReturn(Integer.MAX_VALUE);
-        assertEquals(4_611_686_014_132_420_609L, values.total(100, Integer.MAX_VALUE));
+        assertEquals(4_611_686_014_132_420_609L, values.total(100, Integer.MAX_VALUE, false));
     }
 
     @Test public void skipsEmptySlotsAndZeroQuantity()
     {
-        assertEquals(0, values.total(-1, 10));
-        assertEquals(0, values.total(100, 0));
-        assertEquals(0, values.total(100, -1));
+        assertEquals(0, values.total(-1, 10, false));
+        assertEquals(0, values.total(100, 0, false));
+        assertEquals(0, values.total(100, -1, false));
         verifyNoInteractions(manager);
     }
 
     @Test public void skipsPlaceholders()
     {
         when(item.getPlaceholderTemplateId()).thenReturn(14401);
-        assertEquals(0, values.total(100, 1));
+        assertEquals(0, values.total(100, 1, false));
         verify(manager, never()).getItemPrice(anyInt());
     }
 
     @Test public void skipsUnknownOrInvalidPrices()
     {
-        assertEquals(0, values.total(100, 30));
+        assertEquals(0, values.total(100, 30, false));
         when(manager.getItemPrice(100)).thenReturn(-1);
-        assertEquals(0, values.total(100, 30));
+        assertEquals(0, values.total(100, 30, false));
     }
 
     @Test public void seesPriceAndQuantityChanges()
     {
         when(manager.getItemPrice(100)).thenReturn(20, 30);
-        assertEquals(200, values.total(100, 10));
-        assertEquals(600, values.total(100, 20));
+        assertEquals(200, values.total(100, 10, false));
+        assertEquals(600, values.total(100, 20, false));
     }
 
     @Test public void abbreviatesWithoutRoundingUp()

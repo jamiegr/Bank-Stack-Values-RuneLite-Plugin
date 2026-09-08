@@ -13,11 +13,12 @@ final class StackValue
     @Inject
     StackValue(ItemManager itemManager) { this.itemManager = itemManager; }
 
-    long total(int itemId, int quantity)
+    long total(int itemId, int quantity, boolean hideUntradableValues)
     {
         if (itemId <= 0 || quantity <= 0) { return 0; }
         ItemComposition item = itemManager.getItemComposition(itemId);
         if (item.getPlaceholderTemplateId() != -1) { return 0; }
+        if (hideUntradableValues && !item.isTradeable()) { return 0; }
         // Use the same cached price source and item mappings as RuneLite's Bank plugin.
         return (long) Math.max(0, itemManager.getItemPrice(itemId)) * quantity;
     }

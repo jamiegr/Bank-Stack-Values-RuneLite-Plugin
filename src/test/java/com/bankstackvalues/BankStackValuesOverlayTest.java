@@ -19,6 +19,7 @@ public class BankStackValuesOverlayTest
     private Widget widget;
     private WidgetItem item;
     private BankStackValuesOverlay overlay;
+    private boolean hideUntradableValues;
 
     @Before public void setUp()
     {
@@ -32,7 +33,10 @@ public class BankStackValuesOverlayTest
         item = mock(WidgetItem.class);
         when(item.getWidget()).thenReturn(widget);
         when(item.getCanvasBounds()).thenReturn(new Rectangle(0, 0, 36, 32));
-        overlay = new BankStackValuesOverlay(new BankStackValuesConfig() {}, new StackValue(manager));
+        overlay = new BankStackValuesOverlay(new BankStackValuesConfig()
+        {
+            @Override public boolean hideUntradableValues() { return hideUntradableValues; }
+        }, new StackValue(manager));
     }
 
     private void render()
@@ -40,6 +44,17 @@ public class BankStackValuesOverlayTest
         Graphics2D graphics = new BufferedImage(36, 32, BufferedImage.TYPE_INT_ARGB).createGraphics();
         try { overlay.renderItemOverlay(graphics, 100, item); }
         finally { graphics.dispose(); }
+    }
+
+    @Test public void appliesUntradableSettingChanges()
+    {
+        when(item.getQuantity()).thenReturn(500);
+        hideUntradableValues = true;
+        render();
+        verify(manager, never()).getItemPrice(anyInt());
+        hideUntradableValues = false;
+        render();
+        verify(manager).getItemPrice(100);
     }
 
     @Test public void skipsBankTagLayoutPlaceholdersWithRealItemIds()
