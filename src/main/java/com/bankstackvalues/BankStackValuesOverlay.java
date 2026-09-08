@@ -38,7 +38,7 @@ class BankStackValuesOverlay extends WidgetItemOverlay
         {
             return;
         }
-        long total = values.total(itemId, item.getQuantity(), config.hideUntradableValues());
+        long total = values.total(itemId, item.getQuantity(), config.hideUntradableValues(), config.valueType());
         if (total <= 0) { return; }
         String text = StackValue.format(total);
         Rectangle bounds = item.getCanvasBounds();

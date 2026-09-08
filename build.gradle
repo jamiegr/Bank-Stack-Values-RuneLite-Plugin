@@ -10,7 +10,7 @@ repositories {
 def runeLiteVersion = findProperty('runeliteVersion') ?: 'latest.release'
 
 group = 'com.bankstackvalues'
-version = '1.0.0'
+version = '1.1.0'
 
 dependencies {
     compileOnly "net.runelite:client:${runeLiteVersion}"

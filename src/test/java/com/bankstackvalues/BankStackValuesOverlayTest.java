@@ -113,6 +113,17 @@ public class BankStackValuesOverlayTest
         }
     }
 
+    @Test public void switchingValueTypeImmediatelyChangesValueAndColorTier()
+    {
+        when(item.getQuantity()).thenReturn(500);
+        when(manager.getItemComposition(100).getHaPrice()).thenReturn(30);
+        assertLabelColor(config.over100kColor()); // GE: 125k.
+        when(config.valueType()).thenReturn(ValueType.HIGH_ALCH);
+        assertLabelColor(config.over10kColor()); // HA: 15k.
+        when(config.valueType()).thenReturn(ValueType.GE);
+        assertLabelColor(config.over100kColor());
+    }
+
     @Test public void appliesUntradableSettingChanges()
     {
         when(item.getQuantity()).thenReturn(500);

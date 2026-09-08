@@ -29,6 +29,7 @@ public class BankStackValuesPluginTest
     private ConfigManager manager;
     private AtomicBoolean enabled;
     private ClientThread thread;
+    private ValueType valueType = ValueType.GE;
 
     private void inject(String name, Object value) throws Exception
     {
@@ -69,6 +70,7 @@ public class BankStackValuesPluginTest
         BankStackValuesConfig config = new BankStackValuesConfig()
         {
             @Override public boolean overlayEnabled() { return enabled.get(); }
+            @Override public ValueType valueType() { return valueType; }
         };
         manager = mock(ConfigManager.class);
         thread = mock(ClientThread.class);
@@ -91,6 +93,24 @@ public class BankStackValuesPluginTest
         plugin.onClientTick(new ClientTick());
         assertEquals(3, children.size());
         verify(button).setText("GE: OFF");
+    }
+
+    @Test public void buttonReflectsValueTypeChangesWithoutRecreation()
+    {
+        Widget button = children.get(2);
+        valueType = ValueType.HIGH_ALCH;
+        plugin.onClientTick(new ClientTick());
+        verify(button).setText("HA: ON");
+        verify(button).setName("Bank stack High Alch values");
+        verify(button).setAction(0, "Hide stack High Alch values");
+        enabled.set(false);
+        plugin.onClientTick(new ClientTick());
+        verify(button).setText("HA: OFF");
+        verify(button).setAction(0, "Show stack High Alch values");
+        valueType = ValueType.GE;
+        plugin.onClientTick(new ClientTick());
+        verify(button).setText("GE: OFF");
+        assertEquals(3, children.size());
     }
 
     @Test public void clickPersistsBothToggleDirections()

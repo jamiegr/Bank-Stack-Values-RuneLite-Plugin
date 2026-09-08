@@ -17,8 +17,8 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 
 @PluginDescriptor(name = "Bank Stack Values",
-    description = "Shows each bank stack's GE value with an in-bank toggle",
-    tags = {"bank", "ge", "price", "stack", "value"})
+    description = "Shows each bank stack's GE or High Alch value with an in-bank toggle",
+    tags = {"bank", "ge", "alch", "price", "stack", "value"})
 public class BankStackValuesPlugin extends Plugin
 {
     @Inject private Client client;
@@ -82,7 +82,6 @@ public class BankStackValuesPlugin extends Plugin
             button.setTextShadowed(true);
             button.setXTextAlignment(1);
             button.setYTextAlignment(1);
-            button.setName("Bank stack GE values");
             button.setHasListener(true);
             button.setOnOpListener((JavaScriptCallback) event ->
             {
@@ -95,10 +94,13 @@ public class BankStackValuesPlugin extends Plugin
             });
         }
         boolean enabled = config.overlayEnabled();
+        String valueLabel = config.valueType().toString();
+        String buttonLabel = config.valueType() == ValueType.HIGH_ALCH ? "HA" : "GE";
+        button.setName("Bank stack " + valueLabel + " values");
         background.setTextColor(enabled ? 0x425134 : 0x423b32);
-        button.setText(enabled ? "GE: ON" : "GE: OFF");
+        button.setText(buttonLabel + (enabled ? ": ON" : ": OFF"));
         button.setTextColor(enabled ? 0xffdc64 : 0xc8c0b0);
-        button.setAction(0, enabled ? "Hide stack GE values" : "Show stack GE values");
+        button.setAction(0, enabled ? "Hide" : "Show");
         for (Widget widget : new Widget[]{background, button})
         {
             widget.setOriginalWidth(64);
