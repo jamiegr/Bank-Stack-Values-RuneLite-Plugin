@@ -57,9 +57,19 @@ class BankStackValuesOverlay extends WidgetItemOverlay
             int y = bounds.y + bounds.height - 1;
             g.setColor(Color.BLACK);
             g.drawString(text, x + 1, y + 1);
-            g.setColor(config.textColor());
+            g.setColor(colorForValue(total));
             g.drawString(text, x, y);
         }
         finally { g.dispose(); }
+    }
+
+    private Color colorForValue(long total)
+    {
+        if (config.useDefaultColorForAllStacks()) { return config.textColor(); }
+        if (total > 10_000_000) { return config.over10mColor(); }
+        if (total > 1_000_000) { return config.over1mColor(); }
+        if (total > 100_000) { return config.over100kColor(); }
+        if (total > 10_000) { return config.over10kColor(); }
+        return config.textColor();
     }
 }

@@ -1,5 +1,6 @@
 package com.bankstackvalues;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
@@ -11,6 +12,7 @@ import net.runelite.api.widgets.WidgetItem;
 import net.runelite.client.game.ItemManager;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 public class BankStackValuesOverlayTest
@@ -20,6 +22,7 @@ public class BankStackValuesOverlayTest
     private WidgetItem item;
     private BankStackValuesOverlay overlay;
     private boolean hideUntradableValues;
+    private BankStackValuesConfig config;
 
     @Before public void setUp()
     {
@@ -33,17 +36,81 @@ public class BankStackValuesOverlayTest
         item = mock(WidgetItem.class);
         when(item.getWidget()).thenReturn(widget);
         when(item.getCanvasBounds()).thenReturn(new Rectangle(0, 0, 36, 32));
-        overlay = new BankStackValuesOverlay(new BankStackValuesConfig()
+        config = spy(new BankStackValuesConfig()
         {
             @Override public boolean hideUntradableValues() { return hideUntradableValues; }
-        }, new StackValue(manager));
+        });
+        overlay = new BankStackValuesOverlay(config, new StackValue(manager));
     }
 
-    private void render()
+    private BufferedImage render()
     {
-        Graphics2D graphics = new BufferedImage(36, 32, BufferedImage.TYPE_INT_ARGB).createGraphics();
+        BufferedImage image = new BufferedImage(36, 32, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
         try { overlay.renderItemOverlay(graphics, 100, item); }
         finally { graphics.dispose(); }
+        return image;
+    }
+
+    private void assertLabelColor(Color expected)
+    {
+        BufferedImage image = render();
+        boolean found = false;
+        for (int y = 0; y < image.getHeight(); y++)
+        {
+            for (int x = 0; x < image.getWidth(); x++)
+            {
+                int pixel = image.getRGB(x, y);
+                if (pixel == 0 || pixel == Color.BLACK.getRGB()) { continue; }
+                assertEquals(expected.getRGB(), pixel);
+                found = true;
+            }
+        }
+        assertTrue("Expected a visible value label", found);
+    }
+
+    @Test public void usesDefaultTierColorsWithStrictThresholds()
+    {
+        int[] prices = {1, 10_000, 10_001, 100_000, 100_001,
+            1_000_000, 1_000_001, 10_000_000, 10_000_001};
+        int[] colors = {0xFFFFFF, 0xFFFFFF, 0x66B2FF, 0x66B2FF, 0x99FF99,
+            0x99FF99, 0xFF9600, 0xFF9600, 0xFF66B2};
+        when(item.getQuantity()).thenReturn(1);
+        for (int i = 0; i < prices.length; i++)
+        {
+            when(manager.getItemPrice(100)).thenReturn(prices[i]);
+            assertLabelColor(new Color(colors[i]));
+        }
+    }
+
+    @Test public void usesTotalStackValueAndAppliesColorSettingsImmediately()
+    {
+        when(item.getQuantity()).thenReturn(500); // 250 gp each, 125k total.
+        assertLabelColor(new Color(0x99FF99));
+        when(config.over100kColor()).thenReturn(Color.RED);
+        assertLabelColor(Color.RED);
+        when(config.textColor()).thenReturn(Color.CYAN);
+        when(config.useDefaultColorForAllStacks()).thenReturn(true);
+        assertLabelColor(Color.CYAN);
+        when(config.useDefaultColorForAllStacks()).thenReturn(false);
+        assertLabelColor(Color.RED);
+    }
+
+    @Test public void usesCustomColorsForEveryTier()
+    {
+        when(config.textColor()).thenReturn(Color.RED);
+        when(config.over10kColor()).thenReturn(Color.BLUE);
+        when(config.over100kColor()).thenReturn(Color.GREEN);
+        when(config.over1mColor()).thenReturn(Color.YELLOW);
+        when(config.over10mColor()).thenReturn(Color.MAGENTA);
+        int[] prices = {1, 10_001, 100_001, 1_000_001, 10_000_001};
+        Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.YELLOW, Color.MAGENTA};
+        when(item.getQuantity()).thenReturn(1);
+        for (int i = 0; i < prices.length; i++)
+        {
+            when(manager.getItemPrice(100)).thenReturn(prices[i]);
+            assertLabelColor(colors[i]);
+        }
     }
 
     @Test public void appliesUntradableSettingChanges()

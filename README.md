@@ -31,7 +31,8 @@ This is a local development plugin, not an installed Plugin Hub entry. The inclu
 - **Hide untradable values** hides labels for items marked as untradable, including those with mapped prices. It is off by default.
 - Labels follow the displayed bank items as the bank scrolls, filters or changes tabs. Quantity text at the top of an icon remains visible.
 - This version targets the ordinary personal bank item grid. Potion storage, shared storage and bank-tag sidebar display panels are outside its scope.
-- **Value colour** changes label colour. **Button right offset** and **Button top offset** move the button if a long bank title or another plugin overlaps it. The button remains anchored to the bank's right edge when resized.
+- Label colours are configurable by total stack value: default `#FFFFFF`, >10k `#66B2FF`, >100k `#99FF99`, >1m `#FF9600`, and >10m `#FF66B2`. The highest matching threshold wins; exact thresholds stay in the lower tier. **Use default colour for all stacks** disables tier colours and uses **Default colour** everywhere. An existing saved value colour is retained as the default colour.
+- **Button right offset** and **Button top offset** move the button if a long bank title or another plugin overlaps it. The button remains anchored to the bank's right edge when resized.
 - Disabling the plugin removes its overlay and its own button widgets.
 
 Price data comes from RuneLite's `ItemManager`; the plugin makes no separate price requests. Prices are estimates from the configured source rather than guaranteed sale proceeds.
