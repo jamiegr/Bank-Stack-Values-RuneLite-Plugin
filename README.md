@@ -45,6 +45,8 @@ The overlay targets the **ordinary personal bank item grid**. Potion storage, sh
 
 ## Development
 
+Version **1.1.1** restores compatibility with RuneLite **1.13.1** after its item price API changed to return `long`. GE unit prices above 2,147,483,647 gp retain their full value. Stack totals beyond the `long` limit are capped at `Long.MAX_VALUE` to prevent overflow.
+
 Install a **JDK 11** and set `JAVA_HOME` to its installation directory. Clone this repository, open a terminal in it, then run:
 
 ```powershell

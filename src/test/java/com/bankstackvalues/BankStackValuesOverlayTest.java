@@ -30,7 +30,7 @@ public class BankStackValuesOverlayTest
         ItemComposition definition = mock(ItemComposition.class);
         when(definition.getPlaceholderTemplateId()).thenReturn(-1);
         when(manager.getItemComposition(100)).thenReturn(definition);
-        when(manager.getItemPrice(100)).thenReturn(250);
+        when(manager.getItemPrice(100)).thenReturn(250L);
         widget = mock(Widget.class);
         when(widget.getId()).thenReturn(InterfaceID.Bankmain.ITEMS);
         item = mock(WidgetItem.class);
@@ -78,7 +78,7 @@ public class BankStackValuesOverlayTest
         when(item.getQuantity()).thenReturn(1);
         for (int i = 0; i < prices.length; i++)
         {
-            when(manager.getItemPrice(100)).thenReturn(prices[i]);
+            when(manager.getItemPrice(100)).thenReturn((long) prices[i]);
             assertLabelColor(new Color(colors[i]));
         }
     }
@@ -108,7 +108,7 @@ public class BankStackValuesOverlayTest
         when(item.getQuantity()).thenReturn(1);
         for (int i = 0; i < prices.length; i++)
         {
-            when(manager.getItemPrice(100)).thenReturn(prices[i]);
+            when(manager.getItemPrice(100)).thenReturn((long) prices[i]);
             assertLabelColor(colors[i]);
         }
     }

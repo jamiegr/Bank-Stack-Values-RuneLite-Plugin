@@ -102,11 +102,11 @@ public class BankStackValuesPluginTest
         plugin.onClientTick(new ClientTick());
         verify(button).setText("HA: ON");
         verify(button).setName("Bank stack High Alch values");
-        verify(button).setAction(0, "Hide stack High Alch values");
+        verify(button, times(2)).setAction(0, "Hide");
         enabled.set(false);
         plugin.onClientTick(new ClientTick());
         verify(button).setText("HA: OFF");
-        verify(button).setAction(0, "Show stack High Alch values");
+        verify(button).setAction(0, "Show");
         valueType = ValueType.GE;
         plugin.onClientTick(new ClientTick());
         verify(button).setText("GE: OFF");

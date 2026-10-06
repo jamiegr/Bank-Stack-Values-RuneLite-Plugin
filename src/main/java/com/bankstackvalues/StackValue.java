@@ -21,7 +21,7 @@ final class StackValue
         if (item.getPlaceholderTemplateId() != -1) { return 0; }
         if (hideUntradableValues && !item.isTradeable()) { return 0; }
         // Match RuneLite's Bank plugin, including currency face values in HA mode.
-        int price;
+        long price;
         if (valueType == ValueType.HIGH_ALCH)
         {
             price = itemId == ItemID.COINS ? 1
@@ -31,7 +31,9 @@ final class StackValue
         {
             price = itemManager.getItemPrice(itemId);
         }
-        return (long) Math.max(0, price) * quantity;
+        if (price <= 0) { return 0; }
+        // Mapped GE prices can exceed int range. Keep extreme stack totals positive.
+        return price > Long.MAX_VALUE / quantity ? Long.MAX_VALUE : price * quantity;
     }
 
     static String format(long value)
