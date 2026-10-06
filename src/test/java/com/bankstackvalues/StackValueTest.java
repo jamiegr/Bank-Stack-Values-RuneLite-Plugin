@@ -25,13 +25,13 @@ public class StackValueTest
 
     @Test public void multipliesUnitPriceByStackQuantity()
     {
-        when(manager.getItemPrice(100)).thenReturn(250);
+        when(manager.getItemPrice(100)).thenReturn(250L);
         assertEquals(125_000L, values.total(100, 500, false, ValueType.GE));
     }
 
     @Test public void hidesUntradableItemsWithMappedPrices()
     {
-        when(manager.getItemPrice(100)).thenReturn(250);
+        when(manager.getItemPrice(100)).thenReturn(250L);
         assertEquals(0, values.total(100, 500, true, ValueType.GE));
         verify(manager, never()).getItemPrice(anyInt());
     }
@@ -39,7 +39,7 @@ public class StackValueTest
     @Test public void keepsTradableValuesWhenHidingUntradables()
     {
         when(item.isTradeable()).thenReturn(true);
-        when(manager.getItemPrice(100)).thenReturn(250);
+        when(manager.getItemPrice(100)).thenReturn(250L);
         assertEquals(125_000L, values.total(100, 500, true, ValueType.GE));
     }
 
@@ -48,14 +48,31 @@ public class StackValueTest
         BankStackValuesConfig config = new BankStackValuesConfig() {};
         assertFalse(config.hideUntradableValues());
         assertEquals(ValueType.GE, config.valueType());
-        when(manager.getItemPrice(100)).thenReturn(250);
+        when(manager.getItemPrice(100)).thenReturn(250L);
         assertEquals(125_000L, values.total(100, 500, config.hideUntradableValues(), config.valueType()));
     }
 
     @Test public void doesNotOverflowInt()
     {
-        when(manager.getItemPrice(100)).thenReturn(Integer.MAX_VALUE);
+        when(manager.getItemPrice(100)).thenReturn((long) Integer.MAX_VALUE);
         assertEquals(4_611_686_014_132_420_609L, values.total(100, Integer.MAX_VALUE, false, ValueType.GE));
+    }
+
+    @Test public void supportsUnitPricesAboveIntRange()
+    {
+        when(manager.getItemPrice(100)).thenReturn(3_000_000_000L);
+        assertEquals(6_000_000_000L, values.total(100, 2, false, ValueType.GE));
+        assertEquals("6B", StackValue.format(values.total(100, 2, false, ValueType.GE)));
+    }
+
+    @Test public void capsOnlyTotalsThatWouldOverflowLong()
+    {
+        when(manager.getItemPrice(100)).thenReturn(Long.MAX_VALUE / 2);
+        assertEquals(Long.MAX_VALUE - 1, values.total(100, 2, false, ValueType.GE));
+        when(manager.getItemPrice(100)).thenReturn(Long.MAX_VALUE / 2 + 1);
+        assertEquals(Long.MAX_VALUE, values.total(100, 2, false, ValueType.GE));
+        when(manager.getItemPrice(100)).thenReturn(Long.MAX_VALUE);
+        assertEquals(Long.MAX_VALUE, values.total(100, Integer.MAX_VALUE, false, ValueType.GE));
     }
 
     @Test public void skipsEmptySlotsAndZeroQuantity()
@@ -76,13 +93,13 @@ public class StackValueTest
     @Test public void skipsUnknownOrInvalidPrices()
     {
         assertEquals(0, values.total(100, 30, false, ValueType.GE));
-        when(manager.getItemPrice(100)).thenReturn(-1);
+        when(manager.getItemPrice(100)).thenReturn(-1L);
         assertEquals(0, values.total(100, 30, false, ValueType.GE));
     }
 
     @Test public void seesPriceAndQuantityChanges()
     {
-        when(manager.getItemPrice(100)).thenReturn(20, 30);
+        when(manager.getItemPrice(100)).thenReturn(20L, 30L);
         assertEquals(200, values.total(100, 10, false, ValueType.GE));
         assertEquals(600, values.total(100, 20, false, ValueType.GE));
     }
